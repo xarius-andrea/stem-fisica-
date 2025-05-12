@@ -97,7 +97,7 @@
 
     #note {
       font-size: 0.9em;
-      color: #555;
+      color: #535353;
       margin-top: 20px;
     }
 
@@ -140,7 +140,7 @@
     <div id="output"></div>
 
     <div id="note">
-      <em>Nota:</em> Una maggiore curvatura dell’ala aumenta la portanza.
+      <em>Nota: Una maggiore curvatura dell’ala aumenta la portanza. </em>
     </div>
   </div>
 
@@ -164,8 +164,8 @@
       let v_kmh = parseFloat(document.getElementById("velocita").value);
 
       // Limite di velocità a 7000 km/h
-      if (v_kmh > 7000) {
-        document.getElementById("output").innerHTML = '<div class="error">Errore: La velocità massima consentita è 7000 km/h.</div>';
+      if (v_kmh > 7274) {
+        document.getElementById("output").innerHTML = '<div class="error">Errore: La più alta velocità mai raggiunta da un velivolo è 7274 km/h.</div>';
         return;
       }
 
@@ -220,11 +220,12 @@
       ctx.lineTo(400, baseY + 10);
       ctx.bezierCurveTo(300, baseY + 20, 150, baseY + 20, 50, baseY + 10);
       ctx.closePath();
-      ctx.fillStyle = "#aad4f5";
+      ctx.fillStyle = "#525252";
       ctx.fill();
 
-      ctx.fillStyle = "#333";
-      ctx.fillText(`Curvatura: ${b.toFixed(2)} m`, 60, baseY - 40);
+      ctx.fillStyle = "#000000"; //colore testo
+      ctx.font = "16px Arial";  // Modifica il font e la dimensione se necessario
+      ctx.fillText(`Curvatura: ${b.toFixed(2)} m`, 15, 30); //SCRITTA PICCOLA DENTRO AL CANVAS
     }
 
     function avviaAnimazione() {
