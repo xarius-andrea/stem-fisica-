@@ -128,6 +128,7 @@
       <label>Curvatura ala (m):</label>
       <input type="range" id="profilo" min="0.1" max="1.0" step="0.01" value="0.7" oninput="aggiornaValore()">
       <span id="valoreCurvatura">0.3</span> m<br>
+
       <label>Inclinazione ala (in gradi):</label>
       <input type="range" id="inclinazione" min="0" max="20" step="0.1" value="12.5" oninput="aggiornaInclinazione()"> 
       <span id="valoreInclinazione">12.5</span>°<br>
@@ -135,12 +136,23 @@
       <button onclick="calcola()">Calcola e Simula</button>
     </div>
 
-    <div class="canvases">
-      <canvas id="alaCanvas" width="450" height="300"></canvas>
-      <canvas id="voloCanvas" width="450" height="300"></canvas>
-    </div>
+        <div class="canvases">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <canvas id="alaCanvas" width="450" height="300"></canvas>
+            <canvas id="canvasDati" width="450" height="180"></canvas>
+        </div>
+        <div style="display: flex; flex-direction: column; align-items: center;">
+            <canvas id="voloCanvas" width="450" height="300"></canvas>
+            <canvas id="canvasTempo" width="450" height="80"></canvas>
+        </div>
+        </div>
 
-    <div id="output"></div>
+    <!-- Nuovi canvas per dati e tempo -->
+    <canvas id="canvasDati" width="450" height="150"></canvas><br>
+    <canvas id="canvasTempo" width="450" height="60"></canvas><br>
+
+    <!-- Output nascosto -->
+    <div id="output" style="display:none;"></div>
 
     <div id="note">
       <em>Nota: Una maggiore curvatura dell’ala aumenta la portanza. </em>
@@ -164,8 +176,8 @@
     }
 
     function aggiornaInclinazione() {
-     const inclinazione = parseFloat(document.getElementById("inclinazione").value);
-     document.getElementById("valoreInclinazione").innerText = inclinazione.toFixed(1);
+      const inclinazione = parseFloat(document.getElementById("inclinazione").value);
+      document.getElementById("valoreInclinazione").innerText = inclinazione.toFixed(1);
     }
 
     function calcolaCL(inclinazioneGradi) {
@@ -175,7 +187,7 @@
       const CK = -k * Math.pow(alpha - alphaMax, 2);
       const CL = CK + 1.5;
       return Math.max(CL, 0);
-     
+    
     }
 
     function calcola() {
@@ -219,20 +231,14 @@
         tempo = Math.sqrt((2 * h) / ay).toFixed(2) + " s";
       }
 
-      document.getElementById("output").innerHTML = `
-        <strong>Velocità:</strong> ${v.toFixed(1)} m/s (${v_kmh} km/h | ${nodi.toFixed(0)} kt)<br>
-        <strong>Area ala (una):</strong> ${area_ala.toFixed(2)} m²<br>
-        <strong>Coeff. portanza CL:</strong> ${CL.toFixed(2)}<br>
-        <strong>Curvatura (b):</strong> ${b.toFixed(2)} m<br>
-        <strong>Portanza:</strong> ${portanza.toFixed(0)} N<br>
-        <strong>Peso aereo:</strong> ${peso.toFixed(0)} N<br>
-        <strong>Decollo:</strong> ${decollo ? "✅ Sì" : "❌ No"}<br>
-        <strong>Tempo sollevamento stimato:</strong> ${tempo}
-    
-      `;
+      disegnaDatiAerodinamici(v, area_ala, CL, b, portanza, peso);
+      disegnaTempoSollevamento(tempo);
 
       disegnaAla(b, inclinazione);
       avviaAnimazione();
+
+      disegnaDatiAerodinamici(v, area_ala, CL, b, portanza, peso);
+      disegnaTempoSollevamento(tempo);
     }
 
     function disegnaAla(b, inclinazione) {
@@ -245,68 +251,78 @@
       ctx.translate(alaCanvas.width / 2, alaCanvas.height / 2);
       ctx.rotate(-inclinazioneRad);
       ctx.translate(-alaCanvas.width / 2, -alaCanvas.height / 2);
-
-      ctx.beginPath();
+ctx.beginPath();
       ctx.moveTo(50, baseY);
       ctx.bezierCurveTo(150, baseY - b * scala, 300, baseY - b * scala, 400, baseY);
-      ctx.lineTo(400, baseY + 10);
-      ctx.bezierCurveTo(300, baseY + 20, 150, baseY + 20, 50, baseY + 10);
+ ctx.lineTo(400, baseY + 10);
+      ctx.bezierCurveTo(300, baseY + 10 + b * scala, 150, baseY + 10 + b * scala, 50, baseY + 10);
       ctx.closePath();
-      ctx.fillStyle = "#525252";
+      ctx.fillStyle = "#0056b3";
       ctx.fill();
 
-
       ctx.restore();
-
-
-       // Testo fisso in alto a destra
-        ctx.fillStyle = "#000000";
-        ctx.font = "16px Arial";
-        ctx.textAlign = "left";
-        ctx.fillText(`Curvatura: ${b.toFixed(2)} m`, 10, 20);
     }
-
-
 
     function avviaAnimazione() {
-      y = 200;
+      if (animazioneInCorso) return;
+      animazioneInCorso = true;
       x = 50;
-      if (!animazioneInCorso) {
-        animazioneInCorso = true;
-        requestAnimationFrame(disegnaVolo);
-      }
+      y = 200;
+      vctx.clearRect(0, 0, voloCanvas.width, voloCanvas.height);
+      animazione();
     }
 
-    function disegnaVolo() {
+    function animazione() {
       vctx.clearRect(0, 0, voloCanvas.width, voloCanvas.height);
-      vctx.fillStyle = "#cce6ff";
-      vctx.fillRect(0, 0, voloCanvas.width, voloCanvas.height);
+      vctx.beginPath();
+      vctx.arc(x, y, 15, 0, 2 * Math.PI);
+      vctx.fillStyle = decollo ? "green" : "gray";
+      vctx.fill();
 
-      vctx.fillStyle = "#444";
-      vctx.fillRect(x, y, 80, 20);
-      vctx.fillStyle = "#888";
-      vctx.fillRect(x - 10, y + 5, 100, 5);
+      x += 2;
+      if (decollo && y > 100) y -= 1.5;
 
-      vctx.fillStyle = "#444";
-      vctx.fillRect(0, 290, voloCanvas.width, 10);
-
-      if (decollo && y > 100) {
-        y -= 0.7;
-      }
-
-      if (x < 360) {
-        x += 1.5;
-        requestAnimationFrame(disegnaVolo);
+      if (x < voloCanvas.width) {
+        requestAnimationFrame(animazione);
       } else {
         animazioneInCorso = false;
       }
     }
 
-    window.onload = () => {
-  aggiornaValore();
-  aggiornaInclinazione();
-  calcola();
-};
+    function disegnaDatiAerodinamici(v, area, CL, b, portanza, peso) {
+      const canvas = document.getElementById("canvasDati");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = "14px Roboto";
+      ctx.fillStyle = "#003366";
+
+      const dati = [
+        `Velocità: ${v.toFixed(2)} m/s`,
+        `Area alare: ${area.toFixed(2)} m²`,
+        `Curvatura ala: ${b.toFixed(2)} m`,
+        `CL (coeff. portanza): ${CL.toFixed(3)}`,
+        `Portanza: ${portanza.toFixed(2)} N`,
+        `Peso: ${peso.toFixed(2)} N`,
+        `Decollo: ${portanza > peso ? "SÌ ✈️" : "NO ❌"}`
+      ];
+
+      for (let i = 0; i < dati.length; i++) {
+        ctx.fillText(dati[i], 10, 25 + i * 20);
+      }
+    }
+
+    function disegnaTempoSollevamento(tempo) {
+      const canvas = document.getElementById("canvasTempo");
+      const ctx = canvas.getContext("2d");
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = "18px Roboto";
+      ctx.fillStyle = "#222";
+      ctx.fillText(`Tempo stimato per il decollo: ${tempo}`, 10, 40);
+    }
+
+    // Inizializzazione valori iniziali visuali
+    aggiornaValore();
+    aggiornaInclinazione();
   </script>
 </body>
 </html>
