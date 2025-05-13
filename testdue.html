@@ -194,7 +194,8 @@
       const area2 = areaVAB + areaVCB;
 
       const area_ala = area1 + area2;
-      const CL = p + a * b;
+      const beta = Math.atan((2 * b) / a); // utilizzando un principio della goniometria di cui non ricordo il nome definisco l'angolo d'incidenza dell'aria sull'ala per definire in maniera più precisa il Coefficiente di portana CL)
+      const CL = 2 * Math.PI * beta; //formula approssimativa utilzzata in aerenautica per il calcolo di CL. 
 
       const portanza = 0.5 * rho * v ** 2 * area_ala * 2 * CL; //moltiplico area ala per due in quanto considero entrambe le ali.
 
