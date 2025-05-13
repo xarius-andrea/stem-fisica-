@@ -129,6 +129,9 @@
       <input type="range" id="profilo" min="0.1" max="1.0" step="0.01" value="0.3" oninput="aggiornaValore()">
       <span id="valoreCurvatura">0.3</span> m<br>
 
+      <label>Inclinazione ala (in gradi):</label>
+      <input type="number" id="inclinazione" value="10" min="0" max="20">°<br>
+
       <button onclick="calcola()">Calcola e Simula</button>
     </div>
 
@@ -160,28 +163,33 @@
       document.getElementById("valoreCurvatura").innerText = b.toFixed(2);
     }
 
+    function calcolaCL(inclinazioneGradi) {
+      const alpha = inclinazioneGradi * Math.PI / 180;
+      const alphaMax = 12.5 * Math.PI / 180;
+      const k = 31.58;
+      const CK = -k * Math.pow(alpha - alphaMax, 2);
+      const CL = CK + 1.5;
+      return Math.max(CL, 0);
+     
+    }
+
     function calcola() {
       let v_kmh = parseFloat(document.getElementById("velocita").value);
       const b = parseFloat(document.getElementById("profilo").value);
+      const inclinazione = parseFloat(document.getElementById("inclinazione").value);
 
-      // Conversioni
       const v = v_kmh / 3.6;
       const nodi = v_kmh / 1.852;
       document.getElementById("velocitaNodi").innerText = `≈ ${nodi.toFixed(1)} nodi`;
 
-      // Parametri fissi
       const a = 1.5;
       const L1 = 5;
       const L2 = 15;
-      const p = 0.8;
       const rho = 1.225;
       const massa = 37000;
       const peso = massa * 9.81;
 
-      // Area figura 1 
       const area1 = a * L1 * (Math.PI * b + 1);
-
-      // Area figura 2
       const OH = Math.sqrt((a ** 2) / 16 + (a ** 4) / (64 * b ** 2));
       const k = Math.sqrt(L2 ** 2 + OH ** 2);
       const c = Math.sqrt((a / 2) ** 2 + b ** 2);
@@ -190,16 +198,13 @@
       const OJ = Math.abs((b ** 2 - (a ** 2) / 4) / (2 * b));
       const u = Math.sqrt(L2 ** 2 + OJ ** 2);
       const areaVAB = (a * u) / 2;
-
       const area2 = areaVAB + areaVCB;
 
       const area_ala = area1 + area2;
-      const beta = Math.atan((2 * b) / a); // utilizzando un principio della goniometria di cui non ricordo il nome definisco l'angolo d'incidenza dell'aria sull'ala per definire in maniera più precisa il Coefficiente di portana CL)
-      const CL = 2 * Math.PI * beta; //formula approssimativa utilzzata in aerenautica per il calcolo di CL. 
+      const CL = calcolaCL(inclinazione);
 
-      const portanza = 0.5 * rho * v ** 2 * area_ala * 2 * CL; //moltiplico area ala per due in quanto considero entrambe le ali.
+      const portanza = 0.5 * rho * v ** 2 * area_ala * 2 * CL;
 
-      // ✅ Usiamo la variabile globale "decollo"
       decollo = portanza > peso;
 
       let tempo = "-";
@@ -218,17 +223,23 @@
         <strong>Peso aereo:</strong> ${peso.toFixed(0)} N<br>
         <strong>Decollo:</strong> ${decollo ? "✅ Sì" : "❌ No"}<br>
         <strong>Tempo sollevamento stimato:</strong> ${tempo}
+    
       `;
 
-
-      disegnaAla(b);
+      disegnaAla(b, inclinazione);
       avviaAnimazione();
     }
 
-    function disegnaAla(b) {
+    function disegnaAla(b, inclinazione) {
       ctx.clearRect(0, 0, alaCanvas.width, alaCanvas.height);
       const baseY = 150;
       const scala = 100;
+      const inclinazioneRad = inclinazione * Math.PI / 180;
+
+      ctx.save();
+      ctx.translate(alaCanvas.width / 2, alaCanvas.height / 2);
+      ctx.rotate(-inclinazioneRad);
+      ctx.translate(-alaCanvas.width / 2, -alaCanvas.height / 2);
 
       ctx.beginPath();
       ctx.moveTo(50, baseY);
@@ -239,9 +250,11 @@
       ctx.fillStyle = "#525252";
       ctx.fill();
 
-      ctx.fillStyle = "#000000"; //colore testo
-      ctx.font = "16px Arial";  // Modifica il font e la dimensione se necessario
-      ctx.fillText(`Curvatura: ${b.toFixed(2)} m`, 15, 30); //SCRITTA PICCOLA DENTRO AL CANVAS
+      ctx.fillStyle = "#000000";
+      ctx.font = "16px Arial";
+      ctx.fillText(`Curvatura: ${b.toFixed(2)} m`, 15, 30);
+
+      ctx.restore();
     }
 
     function avviaAnimazione() {
@@ -259,12 +272,12 @@
       vctx.fillRect(0, 0, voloCanvas.width, voloCanvas.height);
 
       vctx.fillStyle = "#444";
-      vctx.fillRect(x, y, 80, 20); // fusoliera
+      vctx.fillRect(x, y, 80, 20);
       vctx.fillStyle = "#888";
-      vctx.fillRect(x - 10, y + 5, 100, 5); // ala
+      vctx.fillRect(x - 10, y + 5, 100, 5);
 
       vctx.fillStyle = "#444";
-      vctx.fillRect(0, 290, voloCanvas.width, 10); // pista
+      vctx.fillRect(0, 290, voloCanvas.width, 10);
 
       if (decollo && y > 100) {
         y -= 0.7;
