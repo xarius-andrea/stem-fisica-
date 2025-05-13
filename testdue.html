@@ -183,6 +183,13 @@
 
     function calcola() {
       let v_kmh = parseFloat(document.getElementById("velocita").value);
+
+       // Limite di velocità a 7000 km/h
+      if (v_kmh > 7274) {
+        document.getElementById("output").innerHTML = '<div class="error">Errore: La velocità massima mai raggiunta da un velivolo è 7274 km/h.</div>';
+        return;
+      }
+
       const b = parseFloat(document.getElementById("profilo").value);
       const inclinazione = parseFloat(document.getElementById("inclinazione").value);
       const massa = parseFloat(document.getElementById("massa").value);
