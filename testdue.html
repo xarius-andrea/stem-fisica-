@@ -164,9 +164,15 @@
 
       <div class="opzioni">
         <details>
+
           <summary>Altre opzioni</summary>
-          <label>Massa del velivolo (kg):</label>
-          <input type="number" id="massa" value="37000" min="1000" max="100000"><br>
+
+              <label>Massa del velivolo (kg):</label>
+                <input type="number" id="massa" value="37000" min="1000" max="100000"><br>
+
+              <label>Apertura alare (m):</label>
+                <input type="number" id="lunghezzaAla" value="15" min="0" max="1"><br>
+
         </details>
       </div>
 
@@ -232,8 +238,8 @@
       document.getElementById("velocitaNodi").innerText = `≈ ${nodi.toFixed(1)} nodi`;
 
       const a = 1.5;
-      const L1 = 5;
-      const L2 = 15;
+      const L1 = parseFloat(document.getElementById("lunghezzaAla").value) / 4 ;
+      const L2 = (parseFloat(document.getElementById("lunghezzaAla").value) / 4 )* 3;
       const rho = 1.225;
       const peso = massa * 9.81;
 
