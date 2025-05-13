@@ -32,6 +32,8 @@
       padding: 20px;
       border-radius: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.1);
+
+      
     }
 
     input[type=number], input[type=range] {
@@ -42,6 +44,16 @@
       width: 200px;
       accent-color: #007bff;
       cursor: pointer;
+    }
+
+    .opzioni {
+
+      details {
+      display: inline-block;
+      margin: 10px auto;
+      text-align: center;
+      }
+
     }
 
     button {
@@ -107,18 +119,33 @@
       margin-top: 10px;
     }
 
+    details {
+      margin-top: 15px;
+      text-align: left;
+      display: inline-block;
+      width: 100%;
+    }
+
+    summary {
+      cursor: pointer;
+      font-weight: bold;
+      color: #004080;
+    }
+
     @media (max-width: 768px) {
       .canvases {
         flex-direction: column;
         align-items: center;
       }
+
+     
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Simulatore di Portanza Aerea</h1>
-    <p>Inserisci la velocità, l'ampiezza dell'ala e la massa del velivolo. Il sistema simula se l'aereo può decollare.</p>
+    <p>Inserisci la velocità, l'ampiezza dell'ala e altre opzioni. Il sistema simula se l'aereo può decollare.</p>
 
     <div class="controls">
       <label>Velocità volo (in km/h):</label>
@@ -129,12 +156,19 @@
       <input type="range" id="profilo" min="0.1" max="1.0" step="0.01" value="0.7" oninput="aggiornaValore()">
       <span id="valoreCurvatura">0.7</span> m<br>
       
-      <label>Massa del velivolo (kg):</label>
-      <input type="number" id="massa" value="37000" min="1000" max="100000"><br>
-      
+    
+
       <label>Angolo di attacco dell'ala (in gradi):</label>
       <input type="range" id="inclinazione" min="0" max="20" step="0.1" value="12.5" oninput="aggiornaInclinazione()"> 
       <span id="valoreInclinazione">12.5</span>°<br>
+
+      <div class="opzioni">
+        <details>
+          <summary>Altre opzioni</summary>
+          <label>Massa del velivolo (kg):</label>
+          <input type="number" id="massa" value="37000" min="1000" max="100000"><br>
+        </details>
+      </div>
 
       <button onclick="calcola()">Calcola e Simula</button>
     </div>
@@ -184,7 +218,6 @@
     function calcola() {
       let v_kmh = parseFloat(document.getElementById("velocita").value);
 
-       // Limite di velocità a 7000 km/h
       if (v_kmh > 7274) {
         document.getElementById("output").innerHTML = '<div class="error">Errore: La velocità massima mai raggiunta da un velivolo è 7274 km/h.</div>';
         return;
@@ -267,7 +300,6 @@
 
       ctx.restore();
 
-      // Testo fisso in alto a destra
       ctx.fillStyle = "#000000";
       ctx.font = "16px Arial";
       ctx.textAlign = "left";
