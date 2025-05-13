@@ -122,11 +122,11 @@
 
     <div class="controls">
       <label>Velocità volo (in km/h):</label>
-      <input type="number" id="velocita" value="700" min="100" max="7000">
-      <span id="vel_nodi">(~378 kt)</span><br>
+      <input type="number" id="velocita" value="250" min="100" max="7000">
+      <span id="velocitaNodi">(~378 kt)</span><br>
 
       <label>Curvatura ala (m):</label>
-      <input type="range" id="profilo" min="0.1" max="0.6" step="0.01" value="0.3" oninput="aggiornaValore()">
+      <input type="range" id="profilo" min="0.1" max="1.0" step="0.01" value="0.3" oninput="aggiornaValore()">
       <span id="valoreCurvatura">0.3</span> m<br>
 
       <button onclick="calcola()">Calcola e Simula</button>
@@ -162,28 +162,43 @@
 
     function calcola() {
       let v_kmh = parseFloat(document.getElementById("velocita").value);
+      const b = parseFloat(document.getElementById("profilo").value);
 
-      // Limite di velocità a 7000 km/h
-      if (v_kmh > 7274) {
-        document.getElementById("output").innerHTML = '<div class="error">Errore: La più alta velocità mai raggiunta da un velivolo è 7274 km/h.</div>';
-        return;
-      }
-
+      // Conversioni
       const v = v_kmh / 3.6;
       const nodi = v_kmh / 1.852;
-      document.getElementById("vel_nodi").innerText = `(~${nodi.toFixed(0)} kt)`;
+      document.getElementById("velocitaNodi").innerText = `≈ ${nodi.toFixed(1)} nodi`;
 
-      let b = parseFloat(document.getElementById("profilo").value);
+      // Parametri fissi
       const a = 1.5;
+      const L1 = 5;
+      const L2 = 15;
       const p = 0.8;
       const rho = 1.225;
       const massa = 37000;
       const peso = massa * 9.81;
-      const area_ali = a * 35.8 * (0.5 * 3.14 * b + 1);
-      const area_ala = area_ali / 2;
-      const CL = p + a * b;
-      const portanza = 0.5 * rho * v ** 2 * area_ali * CL;
 
+      // Area figura 1 
+      const area1 = a * L1 * (Math.PI * b + 1);
+
+      // Area figura 2
+      const OH = Math.sqrt((a ** 2) / 16 + (a ** 4) / (64 * b ** 2));
+      const k = Math.sqrt(L2 ** 2 + OH ** 2);
+      const c = Math.sqrt((a / 2) ** 2 + b ** 2);
+      const areaVCB = c * k;
+
+      const OJ = Math.abs((b ** 2 - (a ** 2) / 4) / (2 * b));
+      const u = Math.sqrt(L2 ** 2 + OJ ** 2);
+      const areaVAB = (a * u) / 2;
+
+      const area2 = areaVAB + areaVCB;
+
+      const area_ala = area1 + area2;
+      const CL = p + a * b;
+
+      const portanza = 0.5 * rho * v ** 2 * area_ala * 2 * CL; //moltiplico area ala per due in quanto considero entrambe le ali.
+
+      // ✅ Usiamo la variabile globale "decollo"
       decollo = portanza > peso;
 
       let tempo = "-";
@@ -194,16 +209,16 @@
       }
 
       document.getElementById("output").innerHTML = `
-        <div class="output-header">Dati di Simulazione:</div>
-        <div class="output-item"><strong>Velocità:</strong> ${v.toFixed(1)} m/s (${v_kmh} km/h | ${nodi.toFixed(0)} kt)</div>
-        <div class="output-item"><strong>Area ala (una):</strong> ${area_ala.toFixed(2)} m²</div>
-        <div class="output-item"><strong>Coeff. portanza CL:</strong> ${CL.toFixed(2)}</div>
-        <div class="output-item"><strong>Curvatura:</strong> ${b.toFixed(2)} m</div>
-        <div class="output-item"><strong>Portanza:</strong> ${portanza.toFixed(0)} N</div>
-        <div class="output-item"><strong>Peso aereo:</strong> ${peso.toFixed(0)} N</div>
-        <div class="output-item"><strong>Decollo:</strong> ${decollo ? "✅ Sì" : "❌ No"}</div>
-        <div class="output-item"><strong>Tempo sollevamento stimato:</strong> ${tempo}
+        <strong>Velocità:</strong> ${v.toFixed(1)} m/s (${v_kmh} km/h | ${nodi.toFixed(0)} kt)<br>
+        <strong>Area ala (una):</strong> ${area_ala.toFixed(2)} m²<br>
+        <strong>Coeff. portanza CL:</strong> ${CL.toFixed(2)}<br>
+        <strong>Curvatura (b):</strong> ${b.toFixed(2)} m<br>
+        <strong>Portanza:</strong> ${portanza.toFixed(0)} N<br>
+        <strong>Peso aereo:</strong> ${peso.toFixed(0)} N<br>
+        <strong>Decollo:</strong> ${decollo ? "✅ Sì" : "❌ No"}<br>
+        <strong>Tempo sollevamento stimato:</strong> ${tempo}
       `;
+
 
       disegnaAla(b);
       avviaAnimazione();
