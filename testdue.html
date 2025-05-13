@@ -176,13 +176,13 @@
       document.getElementById("velocitaNodi").innerText = `≈ ${nodi.toFixed(1)} nodi`;
 
       // Parametri fissi
-      const a = 1.5;
-      const L1 = 5;
-      const L2 = 15;
+      const a = 1.5; //lunghezza della corda 
+      const L1 = 5; //lunghezza trapezio (prima sezione alare)
+      const L2 = 15; //lunghezza triangolo (seconda sezione alare)
       const p = 0.8;
-      const rho = 1.225;
-      const massa = 37000;
-      const peso = massa * 9.81;
+      const rho = 1.225; //rho è densità dell'aria
+      const massa = 37000; //input da far dare all'utente
+      const peso = massa * 9.81; //peso da usare nelle formule
 
       // Area figura 1 
       const area1 = a * L1 * (Math.PI * b + 1);
@@ -203,7 +203,11 @@
       const beta = Math.atan((2 * b) / a); // utilizzando un principio della goniometria di cui non ricordo il nome definisco l'angolo d'incidenza dell'aria sull'ala per definire in maniera più precisa il Coefficiente di portana CL)
       const CL = 2 * Math.PI * beta; //formula approssimativa utilzzata in aerenautica per il calcolo di CL. 
 
+      
+
       const portanza = 0.5 * rho * v ** 2 * area_ala * 2 * CL; //moltiplico area ala per due in quanto considero entrambe le ali.
+
+      //rho densità aria, v velocità, area ala=area ala, cl 
 
       // ✅ Usiamo la variabile globale "decollo"
       decollo = portanza > peso;
