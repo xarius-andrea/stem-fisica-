@@ -145,7 +145,7 @@
 <body>
   <div class="container">
     <h1>Simulatore di Portanza Aerea</h1>
-    <p>Inserisci la velocità, l'ampiezza dell'ala e altre opzioni. Il sistema simula se l'aereo può decollare.</p>
+    <p>Inserisci la velocità, l'ampiezza dell'ala e altre opzioni. Il sistema simula se l'aereo può volare.</p>
 
     <div class="controls">
       <label>Velocità volo (in km/h):</label>
@@ -277,7 +277,6 @@
         <strong>Portanza:</strong> ${portanza.toFixed(0)} N<br>
         <strong>Peso aereo:</strong> ${peso.toFixed(0)} N<br>
         <strong>Decollo:</strong> ${decollo ? "✅ Sì" : "❌ No"}<br>
-        <strong>Tempo sollevamento stimato:</strong> ${tempo}
       `;
 
       disegnaAla(b, inclinazione);
