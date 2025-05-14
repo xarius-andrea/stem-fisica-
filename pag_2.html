@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Simulatore di Portanza Aerea</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <style>
+        body {
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 2.5em;
+}
+
+h2 {
+    margin-top: 30px;
+    color: #333;
+}
+
+h3 {
+    margin-top: 20px;
+}
+
+.contenuto {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 800px;
+    margin: 20px auto;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+pre {
+    background-color: #f9f9f9;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    font-size: 1.1em;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+footer {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
+    </style>
+    <header>
+        <h1>Simulatore di Portanza Aerea</h1>
+    </header>
+
+    <nav style="text-align: center;">
+        <span>|</span>
+        <span><a href="testdue.html">Simulatore</a></span>
+        <span>|</span>
+        <span><a href="pag_2.html">Spiegazione</a></span>
+        <span>|</span>
+    </nav>
+
+    <section class="contenuto">
+        <h2>Scopo del sito</h2>
+        <p>Questo sito nasce con l’obiettivo di offrire una simulazione interattiva del decollo di un aereo, mettendo in evidenza le relazioni fisiche fondamentali che lo rendono possibile. L’utente può modificare parametri come la velocità del volo, l’ampiezza dell’ala, l’angolo di attacco, la massa del velivolo e l’apertura alare, per osservare se il velivolo riesce a generare una portanza sufficiente al decollo e non solo…</p>
+
+        <h2>Dall’effetto Venturi a Bernoulli</h2>
+        <p>Il principio di funzionamento del volo di un aereo si basa sulla differenza di pressione che si genera sopra e sotto le ali. Quando un fluido attraversa un restringimento, la sua velocità aumenta. Questo è noto come effetto Venturi, da cui deriva direttamente l’equazione di Bernoulli:</p>
+        <pre>
+            p +  1/2·d·v²+d·g·h = costante
+            Dove:
+            p = pressione del fluido
+            d = densità del fluido
+            v = velocità del fluido
+            g = accelerazione di gravitazionale
+            h = altezza
+        </pre>
+        <p>Per quanto riguarda l’effetto venturi: si considera generalmente un tubo che si restringe. Quindi il flusso del fluido passa prima per una sezione “a” del tubo ad una velocità “a”; per poi subire gli effetti del restringimento e passare per una sezione del tubo “b” ad una velocità “b”. In questo caso la pressione in “a” sarà uguale a (Pa=F/Sa) e in “b” sarà (Pb=F/Sb) e per Sa>Sb deduciamo come la pressione in “b” sia maggiore di quella in “a” (Pb>Pa). </p>
+
+        <h2>Velocità e Pressione sopra e sotto l’ala</h2>
+        <p>Nel sito, l’utente può modificare l’ampiezza dell’ala (semiasse minore b). All’aumentare di quest’ultima aumenta il profilo alare e il suo perimetro. L’aria sopra l’ala percorre più spazio, quindi per arrivare nello stesso tempo alla fine dell’ala, deve muoversi più velocemente. Questo causa una pressione minore sopra ed una conseguente differenza di pressione che favorisce la spinta verso l’alto.</p>
+
+        <h2>La portanza e la sua formula</h2>
+        <p>La portanza è la spinta perpendicolare al moto dell'aereo che fa sì che l'aria spinga l'aereo dal basso verso l'alto. Viene spesso indicata con la lettera L dall'inglese lift. Questa non dipende solo dalla forma del profilo alare, ma anche dall'inclinazione dell'ala rispetto alla direzione di volo. A seconda dell'angolo di inclinazione si può ottenere una portanza maggiore, minore o addirittura contraria, con la pressione maggiore che spinge dall'alto verso il basso. Inclinando le ali con diversi angoli rispetto all'orizzontale gli aerei riescono ad affrontare i diversi momenti del viaggio, dal decollo all'atterraggio.</p>
+        
+        <pre>
+            L =  1/2·d·v²·S·CL
+            Dove:
+                d = densità dell’aria (1.225 kg/m³),
+                v = velocità dell’aria (in m/s),
+                S = superficie alare (di una singola ala),
+                CL = coefficiente di portanza.
+        </pre>
+        <p>La condizione per il decollo è:</p>
+        <pre>
+            L > m·g
+        </pre>
+        <p>Cioè la portanza deve essere maggiore del peso del velivolo.</p>
+
+        <h2>Il coefficiente di portanza CL</h2>
+        <p>Il coefficiente CL è un termine dell’equazione che restituisce la portanza. Questo rappresenta l’efficienza aerodinamica dell’ala e dipende in gran parte dall’angolo di attacco. In letteratura è stato dimostrato che il CL cresce con l’angolo fino a un certo punto (detto αₘₐₓ) e poi cala per via dello stallo. Il calcolo di CL risulta abbastanza complesso, dovendo utilizzare dati non richiesti dal programma e non deducibili in alcun modo.</p>
+        <p>Per queste motivazioni, rifacendosi ai valori reali per cui CL raggiunge la sua efficienza massima, è stato possibile definire un modello parabolico approssimato:</p>
+        <pre>
+            CL(α) = -k·(α - αₘₐₓ)² + CLₘₐₓ
+            Dove:
+                k ≈ 31.58 (valore empirico),
+                α = angolo di attacco in radianti,
+                αₘₐₓ = 12.5°,
+                CLₘₐₓ = 1.5.
+        </pre>
+
+        <h2>Calcolo dell’area alare</h2>
+        <p>Data l’impossibilità di utilizzare integrali e modelli complessi, l’ala è stata modellata come: un rettangolo sormontato da un mezzo cilindro a base ellittica, seguito da una piramide a base triangolare isoscele.</p>
+        <p>Formula semplificata iniziale:</p>
+        <pre>
+            S_b = a · L₁
+            S_e ≈ π · a · b · L₁
+            S ≈ a·L₁·(π·b + 1)
+        </pre>
+
+        <h2>Formula migliorata</h2>
+        <p>Si calcola il perimetro della mezza ellisse usando un’approssimazione di Ramanujan:</p>
+        <pre>
+            P ≈ 1/2 π(a·r)·[1 + 3h/(10 + √(4-3h))]
+            con h = ((a - r)/(a + r))²
+        </pre>
+        <p>Si può ora calcolare l’area del mezzo cilindro ellittico:</p>
+        <pre>
+            S_e = 1/2·P·L₁
+            S_tot = a·L₁ + S_e
+        </pre>
+        <p>Questa formula è più precisa e permette di ottenere valori realistici, ad esempio tra 50 m² e 60 m² per una singola ala.</p>
+
+        <p>Il sito dimostra quindi in modo chiaro come parametri come lo spessore dell’ala e l’angolo di attacco influenzino le condizioni di volo e, seppur con l’approssimazione di forme realistiche e formule tratte dalla fisica dell’aerodinamica, si offre una simulazione efficace e verosimile.</p>
+    </section>
+
+    <footer>
+        <p>&copy; 2025 Simulatore di Portanza Aerea. Tutti i diritti riservati.</p>
+    </footer>
+    <p> <br> <br><br><br><br><br></p>
+    
+</body>
+</html>
